@@ -1,0 +1,23 @@
+model: LightGCN
+
+# model args
+embedding_size: 64
+n_layers: 2
+reg_weight: 1e-05
+
+learning_rate: 1e-2
+learner: adam
+epochs: 100
+
+# data args
+data_source: down
+
+# save_dataset: True
+# save_dataloaders: True
+load_col:
+    inter: [user_id, item_id, exposure_time]
+unused_col:
+    inter: [exposure_time]
+
+# eval args
+eval_batch_size: 4096

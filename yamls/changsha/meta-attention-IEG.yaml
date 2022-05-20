@@ -1,0 +1,9 @@
+attention_data_path: 'pth/changsha-meta-IEG-attention_data.pth'
+fusion_method: 'attention_method'
+attention_module_file: 'pth/changsha-meta-IEG-attention_module.pth'
+mlp_hidden_size: [128]
+attention_learner: adam
+attention_learning_rate: 1e-5
+attention_weight_decay: 0.0
+attention_epochs: 100
+construct_data_rate: 0.25
