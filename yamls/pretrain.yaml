@@ -1,0 +1,25 @@
+# data processing args
+# user_inter_num_interval: '[5,inf)'
+# item_inter_num_interval: '[5,inf)'
+
+# data_split_time: 1631825276
+data_split_time: 1631289599
+# upstream_user_inter_num_interval: '[4,inf)'
+# downstream_user_inter_num_interval: '[4,inf)'
+
+stopping_step: 500
+
+# train args
+# train_batch_size: 2048
+
+# eval args
+eval_args:
+  split: {'LS': 'valid_and_test'}
+  order: TO
+  mode: full
+repeatable: True
+# metrics: ["Recall","MRR","NDCG","Hit","Precision"]
+# topk: [10]
+metrics: ["Recall","MRR","NDCG"]
+topk: [5,10,20]
+valid_metric: MRR@10
