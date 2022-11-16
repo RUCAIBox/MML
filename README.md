@@ -18,7 +18,7 @@ We provide the script for reproducing the experimental results in this repositor
 For example, if you want to get the result for `hangzhou`, 
 you should firstly download the data files and put them into `dataset/hangzhou` folder.
 
-**NOTE: Due to privacy policies, our data is not availiable temporarily. We will make data masking and release the desensitized data after camera ready.**
+**NOTE: Due to privacy policies, our data is not availiable temporarily.**
 
 And then you can execute the following command:
 ```bash
