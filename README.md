@@ -30,22 +30,8 @@ user_id:token item_id:token
 ...
 ```
 
-`hangzhou.item.txt` (text information):
-```
-item_id:token	txt_emb:float_seq
-1234 -0.24010642 -0.01735022 -1.067751...
-1235 0.029363764 -0.059917185 -1.0038725...
-...
-```
-
-
-`hangzhou.item.img` (image information):
-```
-item_id:token	txt_emb:float_seq
-1234 0.32926455 -0.10043134 -0.905908...
-1235 -0.24625528 0.0195307 -1.0814264...
-...
-```
+For multimodal information file, please refer [prepare multimodal information file](https://github.com/RUCAIBox/MML/blob/main/prepare_multimodal_information_file)
+ 
 ### Run the model:
 After data preparation, you can execute the following command:
 ```bash
