@@ -19,8 +19,35 @@ For example, if you want to get the result for `hangzhou`,
 you should firstly download the data files and put them into `dataset/hangzhou` folder.
 
 **NOTE: Due to privacy policies, our data is not availiable temporarily.**
+### Data format example:
+Our input data format is followed [RecBole](https://github.com/RUCAIBox/RecBole), click [here](https://recbole.io/docs/user_guide/data/atomic_files.html) for more information about input data format in RecBole. Here, we take `hangzhou` dataset as an example.
 
-And then you can execute the following command:
+`hangzhou.inter` (user-item interaction data):
+```
+user_id:token item_id:token
+1 1234
+2 1235
+...
+```
+
+`hangzhou.item.txt` (text information):
+```
+item_id:token	txt_emb:float_seq
+1234 -0.24010642 -0.01735022 -1.067751...
+1235 0.029363764 -0.059917185 -1.0038725...
+...
+```
+
+
+`hangzhou.item.img` (image information):
+```
+item_id:token	txt_emb:float_seq
+1234 0.32926455 -0.10043134 -0.905908...
+1235 -0.24625528 0.0195307 -1.0814264...
+...
+```
+### Run the model:
+After data preparation, you can execute the following command:
 ```bash
 bash script/run_meta.sh hangzhou 0
 ```
