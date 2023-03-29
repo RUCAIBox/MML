@@ -37,6 +37,8 @@ class SASRec(SequentialRecommender):
         super(SASRec, self).__init__(config, dataset)
 
         # load parameters info
+        self.config = config
+    
         self.n_layers = config['n_layers']
         self.n_heads = config['n_heads']
         self.hidden_size = config['hidden_size']  # same as embedding_size
@@ -62,7 +64,21 @@ class SASRec(SequentialRecommender):
             hidden_act=self.hidden_act,
             layer_norm_eps=self.layer_norm_eps
         )
-
+       
+        pth = config['item_feat_emb']
+        item_emb = torch.load(pth)
+        if isinstance(item_emb, dict):
+            item_feat = torch.zeros((dataset.item_num, item_emb['embs'].size(-1)))
+            token2id = dataset.field2token_id[dataset.iid_field]
+            for item, emb in zip(item_emb['item_id'], item_emb['embs']):
+                if item in token2id:
+                    item_id = token2id[item]
+                    item_feat[item_id] = emb
+        else:
+            item_feat = item_emb
+        self.item_feat = item_feat.to(self.config['device'])
+        self.item_projection = nn.Linear(item_feat.size(-1), self.hidden_size)  
+            
         self.LayerNorm = nn.LayerNorm(self.hidden_size, eps=self.layer_norm_eps)
         self.dropout = nn.Dropout(self.hidden_dropout_prob)
 
@@ -88,26 +104,38 @@ class SASRec(SequentialRecommender):
         if isinstance(module, nn.Linear) and module.bias is not None:
             module.bias.data.zero_()
 
-    def get_attention_mask(self, item_seq):
+    def get_attention_mask(self, item_seq, item_feature_seq=None):
         """Generate left-to-right uni-directional attention mask for multi-head attention."""
-        attention_mask = (item_seq != 0)
-        extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)  # torch.bool
-        extended_attention_mask = torch.tril(extended_attention_mask.expand((-1, -1, item_seq.size(-1), -1)))
-        extended_attention_mask = torch.where(extended_attention_mask, 0., -10000.)
+        if item_feature_seq == None:
+            attention_mask = (item_seq != 0)
+            extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)  # torch.bool
+            extended_attention_mask = torch.tril(extended_attention_mask.expand((-1, -1, item_seq.size(-1), -1)))
+            extended_attention_mask = torch.where(extended_attention_mask, 0., -10000.)
+        else:
+            feature_bias = item_feature_seq @ torch.transpose(item_feature_seq,-1,-2)
+            attention_mask = (item_seq != 0)
+            extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)  # torch.bool
+            extended_attention_mask = torch.tril(extended_attention_mask.expand((-1, -1, item_seq.size(-1), -1)))
+            feature_bias = torch.tensor(0.001*feature_bias).unsqueeze(1)
+            extended_attention_mask = torch.where(extended_attention_mask, feature_bias, torch.tensor(-1e5, device=self.config['device']))
         return extended_attention_mask
-
+    
+    
     def forward(self, item_seq, item_seq_len, with_last_layer=False):
         position_ids = torch.arange(item_seq.size(1), dtype=torch.long, device=item_seq.device)
         position_ids = position_ids.unsqueeze(0).expand_as(item_seq)
         position_embedding = self.position_embedding(position_ids)
 
         item_emb = self.item_embedding(item_seq)
+       
         input_emb = item_emb + position_embedding
         input_emb = self.LayerNorm(input_emb)
         input_emb = self.dropout(input_emb)
-
-        extended_attention_mask = self.get_attention_mask(item_seq)
-
+ 
+        item_feature_seq = self.item_projection(self.item_feat[item_seq])
+        extended_attention_mask = self.get_attention_mask(item_seq, item_feature_seq)
+       
+        
         trm_output = self.trm_encoder(input_emb, extended_attention_mask, output_all_encoded_layers=True)
         last_layer = trm_output[-1]
         output = self.gather_indexes(last_layer, item_seq_len - 1)
