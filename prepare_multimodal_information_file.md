@@ -8,7 +8,7 @@ item_id:token	txt_emb:float_seq
 1235 0.029363764 -0.059917185 -1.0038725...
 ...
 ```
-And then, apply the following `.py` script to tranfer this file as `.pth` file:
+And then, apply the following Python script to tranfer this file as `.pth` file:
 ```python
 import torch 
 f = open("text_emb.txt","r")
