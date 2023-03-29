@@ -30,7 +30,7 @@ user_id:token item_id:token
 ...
 ```
 
-For multimodal information file, please refer [prepare multimodal information file](https://github.com/RUCAIBox/MML/blob/main/prepare_multimodal_information_file)
+For multimodal information file, please refer [prepare multimodal information file](https://github.com/RUCAIBox/MML/blob/main/prepare_multimodal_information_file.md)
  
 ### Run the model:
 After data preparation, you can execute the following command:
